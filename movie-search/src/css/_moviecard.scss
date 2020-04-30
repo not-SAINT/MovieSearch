@@ -1,0 +1,53 @@
+.movie-card {
+  width: 100%;
+  height: 500px;
+  position: relative;
+
+  font-weight: 700;
+  text-align: center;
+
+  border: 1px solid $color-shadow;
+  user-select: none;
+
+  &__title {
+    margin: 15px 25px;
+    font-size: 2rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    word-wrap: break-word;
+
+  }
+  &__link {
+    text-decoration: none;
+  }
+  &__poster {
+    display: block;
+    width: 100%;
+    height: 80%;
+    margin-bottom: 15px;
+    object-fit: cover;
+  }
+
+  &__year {
+    margin-top: 20px;
+    font-size: 1.8rem;    
+  }
+  &__rating {
+    position: absolute;
+    font-size: 1.5rem;
+    right: 5px;
+    bottom: 5px;
+  }
+  &__rating::before {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    position: absolute;
+    bottom: -3px;
+    right: 46px;
+    content: "";
+    background: url("../img/icons/rating.svg") no-repeat ;
+    background-size: contain;
+  }
+}

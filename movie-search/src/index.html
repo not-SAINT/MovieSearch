@@ -4,8 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>new</title>
-</head>
+</head>   
 <body>
+    <header>      
+        <div class="header-container">
+            <h1 class="logo">Movie Search</h1>
+        </div>       
+    </header>
+    <main>      
+      <div class="wrapper">
 
+        <div class="search-bar">
+          <span class="loupe"></span>
+          <input class="search-input" id="searchinput" type="search" placeholder="Search movie">
+          <button class="search-btn" id="searchbtn">Search</button>
+        </div>
+
+        <div class="error-bar" id="errorbar">
+          <span class="error-bar__text"></span>
+        </div>
+        
+        <div class="glide" id="glide">
+            <div class="glide__track" data-glide-el="track">
+              <div class="glide__slides" id="slides">
+              </div>
+            </div>
+      
+            <div class="glide__arrows" data-glide-el="controls">
+              <button class="glide__arrow glide__arrow--left" data-glide-dir="<">prev</button>
+              <button class="glide__arrow glide__arrow--right" data-glide-dir=">">next</button>
+            </div>
+      
+            <div class="glide__bullets" data-glide-el="controls[nav]">
+              <button class="glide__bullet" data-glide-dir="=0"></button>
+              <button class="glide__bullet glide__bullet--active" data-glide-dir="=1"></button>
+              <button class="glide__bullet" data-glide-dir="=2"></button>
+              <button class="glide__bullet" data-glide-dir="=3"></button>
+              <button class="glide__bullet" data-glide-dir="=4"></button>
+              <button class="glide__bullet" data-glide-dir="=5"></button>
+            </div>
+        </div>
+      </div>
+    </main>
+    <footer class="footer">
+      <div class="wrapper">
+        <div class="footer-container">
+          <a href="https://rs.school/" class="footer__link" target="_blank">RS School 2020q1</a>
+          <a href="https://github.com/not-SAINT" class="footer__link" target="_blank">github</a>
+        </div>        
+      </div>
+    </footer>
 </body>
 </html>
