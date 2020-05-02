@@ -5,47 +5,131 @@ import MovieCard from './moviecard';
 
 export default class MovieSearch {
   constructor(sliderId) {
-    this.sliderId = sliderId;
-    this.slider = document.getElementById(sliderId);
+    this.sliderId = sliderId;    
+    this.lastResultSize = 0;
+    this.currPage = 1;
+    this.slidesContainer = document.getElementById(sliderId);
+    this.errorfield = document.getElementById('errorfield');
+    this.lastSearchText = '';
+  }
+
+  async getMovieDetails (movieId) {
+    const rating = document.getElementById(movieId).lastChild;
+      rating.innerText = `x/10`;
+    // try {
+      
+    //   console.log(`ID = ${movieId} start get rating`);
+    //   const searchUrl = `${AppOptions.OMDB_API_URL}${AppOptions.OMDB_API_KEY}&i=${movieId}`;
+    //   const res = await fetch(searchUrl);
+    //   const data = await res.json();
+      
+    //   console.log(`ID = ${movieId} rating = ${rating}`);
+    //   if (data.imdbRating) {
+    //     console.log(`ID = ${movieId} rating = ${data.imdbRating}`);
+        
+    //     rating.innerText = `${data.imdbRating}/10`;
+
+    //     console.log(`ID = ${movieId} after = ${rating.innerText}`);
+    //   }      
+    // } catch (e) {
+    //   console.log(`getMovieDetails error => ${e}`);
+      
+    //   this.showError(e);
+    // }
   }
 
   addNewSlides (slides) {
     slides.forEach((n) => {
       const card = new MovieCard(n);
-      this.slider.append(card.render());
+      this.slidesContainer.append(card.render());
+      if (AppOptions.RATING_ON) {
+        this.getMovieDetails(n.imdbID);
+      }
     });
   }
 
+  showError(msg) {
+    this.errorfield.innerText = msg;
+  }
+
+  clearError() {
+    this.errorfield.innerText = '';
+  }
+
   loadDefaultMovieCards () {
-    // export const def_res = {"Search":[{"Title":"Star Wars: Episode IV - A New Hope","Year":"1977","imdbID":"tt0076759","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BNzVlY2MwMjktM2E4OS00Y2Y3LWE3ZjctYzhkZGM3YzA1ZWM2XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg"},{"Title":"Star Wars: Episode V - The Empire Strikes Back","Year":"1980","imdbID":"tt0080684","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BYmU1NDRjNDgtMzhiMi00NjZmLTg5NGItZDNiZjU5NTU4OTE0XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg"},{"Title":"Star Wars: Episode VI - Return of the Jedi","Year":"1983","imdbID":"tt0086190","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BOWZlMjFiYzgtMTUzNC00Y2IzLTk1NTMtZmNhMTczNTk0ODk1XkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_SX300.jpg"},{"Title":"Star Wars: Episode VII - The Force Awakens","Year":"2015","imdbID":"tt2488496","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BOTAzODEzNDAzMl5BMl5BanBnXkFtZTgwMDU1MTgzNzE@._V1_SX300.jpg"},{"Title":"Star Wars: Episode I - The Phantom Menace","Year":"1999","imdbID":"tt0120915","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BYTRhNjcwNWQtMGJmMi00NmQyLWE2YzItODVmMTdjNWI0ZDA2XkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_SX300.jpg"},{"Title":"Star Wars: Episode III - Revenge of the Sith","Year":"2005","imdbID":"tt0121766","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BNTc4MTc3NTQ5OF5BMl5BanBnXkFtZTcwOTg0NjI4NA@@._V1_SX300.jpg"},{"Title":"Star Wars: Episode II - Attack of the Clones","Year":"2002","imdbID":"tt0121765","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BMDAzM2M0Y2UtZjRmZi00MzVlLTg4MjEtOTE3NzU5ZDVlMTU5XkEyXkFqcGdeQXVyNDUyOTg3Njg@._V1_SX300.jpg"},{"Title":"Star Trek","Year":"2009","imdbID":"tt0796366","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BMjE5NDQ5OTE4Ml5BMl5BanBnXkFtZTcwOTE3NDIzMw@@._V1_SX300.jpg"},{"Title":"Star Wars: Episode VIII - The Last Jedi","Year":"2017","imdbID":"tt2527336","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BMjQ1MzcxNjg4N15BMl5BanBnXkFtZTgwNzgwMjY4MzI@._V1_SX300.jpg"},{"Title":"Rogue One: A Star Wars Story","Year":"2016","imdbID":"tt3748528","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BMjEwMzMxODIzOV5BMl5BanBnXkFtZTgwNzg3OTAzMDI@._V1_SX300.jpg"}],"totalResults":"2935","Response":"True"};
     const index = getRandomIndex(AppOptions.rndreq.length);
     const arr = AppOptions.rndreq[index].Search;
 
-    this.addNewSlides(arr);
-  }
-    
-
-  async loadMovieCardsByRequest (searchString, pageNum = 1) {
-
-    const searchUrl = `${AppOptions.API_URL}${AppOptions.API_KEY}&page=${pageNum}&s=${searchString}`;
-
-    const res = await fetch(searchUrl);
-    const data = await res.json();
-    
-    // {"Response":"False","Error":"Too many results."}
-    if (data.Error) {
-      console.log(data.Error);
+    if (!arr) {
+      this.errorfield.innerText = `${AppOptions.DEFAULT_ERROR} ...`;
       return;
     }
-    
-    console.log(data.Search[0].Title);
-    console.log(data.Search.length);
-    this.lastRequestResult = data.Search.length;
 
-    if (this.lastRequestResult) {
-      this.slider.innerHTML = '';
-      this.addNewSlides(data.Search);
+    this.errorfield.innerText = '';
+    this.addNewSlides(arr);
+  }
+
+  async translateAndSearch (text) {
+    try {
+      const translateUrl = `${AppOptions.YANDEX_API_URL}${AppOptions.YANDEX_API_KEY}&text=${text}`;
+
+      const res = await fetch(translateUrl);
+      const data = await res.json();
+      if (data.code === 200 && data.text) {   
+        this.currPage = 1;            
+        [ this.lastSearchText ] = data.text;
+        // console.log(`translate res = ${this.lastSearchText}`);
+        this.getMovieCards(this.lastSearchText);
+      } 
+        // 
+      // return 1;
+            
+
+    } catch (e) {
+      console.log(`getTranslate error => ${e}`);
+      this.showError(e);
     }
+    return 1;
+  }
+ 
+  async getMovieCards (searchString, nextPage = false) {
+    try {
+      this.currPage = nextPage ? this.currPage + 1 : 1;
 
+      const searchUrl = `${AppOptions.OMDB_API_URL}${AppOptions.OMDB_API_KEY}&page=${this.currPage}&s=${searchString}`;
+      const res = await fetch(searchUrl);
+      const data = await res.json();
+    
+    
+    
+      // {"Response":"False","Error":"Too many results."}
+      if (data.Error) {
+        // this.errorfield.innerText = `${AppOptions.DEFAULT_ERROR}${searchString}. ${data.Error}`;
+        this.showError(`${AppOptions.DEFAULT_ERROR}${searchString}. ${data.Error}`);
+        // console.log(data.Error);
+        return;
+      }
+      
+      // console.log(data.Search[0].Title);
+      // console.log(data.Search.length);
+      this.clearError();
+      this.lastRequestResult = data.Search.length;
+      
+
+      console.log(' lastRequestResult ' + data.Search.length);
+      console.log(' this.currPage ' + this.currPage);
+      
+
+      if (this.lastRequestResult) {
+        if (this.currPage === 1) {
+          this.slidesContainer.innerHTML = '';
+        }        
+        this.addNewSlides(data.Search);
+      }
+      
+    } catch (e) {
+      console.log(`loadMovieCardsByRequest error => ${e}`);
+      this.showError(e);
+    }
   }
 }

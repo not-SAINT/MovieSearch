@@ -2,7 +2,7 @@
   width: 100%;
   display: flex;
   position: relative;
-  margin: 50px 0;
+  margin: 50px 0 0;
 }
 
 .search-input {
@@ -64,5 +64,25 @@
     background-color: $color-search;
     border-radius: 10px;
     transform: rotateZ(52deg);
+  }
+}
+
+.error-bar {
+  // height: 30px;
+  margin: 20px 0 30px;
+
+  // background-color: orange;
+  &__text {
+    // display: block;
+    max-width: 90%;
+    height: 30px;
+    margin: 0 auto;
+
+    font-size: 1.5rem;
+    text-align: center;
+    color: $color-error;
+    @extend %text-overflow;
+
+    // background-color: rgb(247, 245, 247);
   }
 }

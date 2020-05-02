@@ -10,3 +10,7 @@ export const createDomElement = (elementName = 'div', className) => {
 export const getRandomIndex = (length) => {
   return Math.floor(Math.random() * length);
 }
+
+export const isCyrilic = (text) => {
+  return /[а-я]/i.test(text);
+}
