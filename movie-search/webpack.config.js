@@ -67,7 +67,10 @@ const config = {
           }, {
             loader: 'sass-loader',
             options: {
-              sourceMap: true
+              sourceMap: true,
+              // "includePaths": [
+              //   require('path').resolve(__dirname, 'node_modules')
+              // ]
             }
           }
         ]
@@ -146,6 +149,18 @@ const config = {
     overlay: true,
     stats: 'errors-only',
     clientLogLevel: 'none'
+  },
+
+  resolve: {
+    alias: {      
+      // '@': path.resolve(__dirname, './src'),
+      ro: path.resolve(__dirname, './src'),
+      Utilities: path.resolve(__dirname, '.src/css/'),
+      // '@': path.resolve(__dirname, 'src/'),
+      // node_m: path.resolve(__dirname, './node_modules/'),
+      // 'swiper.css' : 'node_modules/swiper/dist/css/swiper.css',
+    },
+    // extensions: ['.js', '.css']
   }
 }
 

@@ -1,23 +1,30 @@
 .footer {
   width: 100%;
-  // position: fixed;
-  // left: 0;
-  // bottom: 0;
-  margin-top: 100px;
   background-color: $color-main;
+  @media screen and (min-height: 900px) {
+    position: fixed;
+    bottom: 0;
+  }
 }
 
 .footer-container {
+  width: 100%;
   display: flex;
   height: $menu-height;
+  padding: 0 30px;
+  box-sizing: border-box;
   justify-content: space-between;
-  align-items: center;  
+  align-items: center; 
+  // @include media-laptop {
+  //   width: 94vw;
+  // } 
 }
 
 .footer__link {
   font-weight: 700;
   text-decoration: none;
+  color: $color-link-active;
   &:hover {    
-    color: $color-link;
+    color: $color-link-hover;
   }
 }

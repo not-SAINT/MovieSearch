@@ -1,11 +1,17 @@
+// import 'swiper.css';
+
+// import 'Utilities/swiper.min.css';
+// import '@/../node_modules/swiper/css/swiper.min.css';
+
+import '../css/swiper.min.css';
 import '../css/style.css';
 import '../css/style.scss';
 
-import Glide from '../../node_modules/@glidejs/glide';
+import Swiper from 'swiper';
+
 import * as AppOptions from './options';
 import * as Worker from './worker';
 import MovieSearch from './app';
-import HtmlFix from './glidefix';
 
 let APP = {};
 let SLIDER = {};
@@ -16,113 +22,159 @@ let INPUT = {};
 // }
 
 const showSlides = () => {
-  document.querySelectorAll('.movie-card__hide').forEach(n => n.classList.remove('movie-card__hide'));
+  document.querySelectorAll('.movie-card').forEach(n => n.classList.add('movie-card__show'));
   // setTimeout(() => {
   //   console.log('show delay');
     
   // }, 10000);
 }
 
-const showMoreResults = () => {
+const hideSlides = () => {
+  document.querySelectorAll('.movie-card').forEach(n => n.classList.remove('movie-card__show'));
+}
+
+const updateSlider = () => {
+  console.log('update slider');  
+  SLIDER.update();
+  SLIDER.navigation.update();
+  showSlides();
+}
+
+const startAnimateSearching = () => {
+  document.getElementById('loupe').classList.add('loupe-searching');
+}
+
+const nextSlide = () => {
+  if (APP.currPage < APP.lastSearchPageCount) {
+    SLIDER.slideNext();
+  }
+}
+
+const nextDefaultSlides = () => {
+  APP.loadDefaultMovieCards();
+  updateSlider();
+  showSlides();
+  nextSlide();
+}
+
+
+const showMoreResults = () => {    
+  console.log('showMoreResults =>');
+  
   const searchString = INPUT.value;
   if (!searchString) {
+    nextDefaultSlides();
     return;
   }
-  // hideSlides();
-  SLIDER.destroy();
-  APP.getMovieCards(searchString, 1);
 
-  const cntSlides = document.querySelectorAll('.movie-card').length;
-  const curPerView = SLIDER.settings.perView;
-  // eslint-disable-next-line no-use-before-define
-  buildSlider(cntSlides - curPerView);     
+  startAnimateSearching();
+  
+  APP.getMovieCards(searchString, true)
+    .then( () => {
+      console.log(`after showMoreResults =>`);
+      
+      updateSlider();
+      
+      // SLIDER.navigation.update();
+      nextSlide();
+    });
 }
+
+
 
 const searchMovies = () => {
   const searchString = document.getElementById('searchinput').value; 
-  // hideSlides(); 
+  hideSlides(); 
   
   if (!searchString) {
-    const cntSlides = document.querySelectorAll('.movie-card').length;
-    const curPerView = SLIDER.settings.perView;
-    // console.log(curPerView);
-    
-    SLIDER.destroy();
-    APP.loadDefaultMovieCards();
-
-    // eslint-disable-next-line no-use-before-define
-    buildSlider(cntSlides - curPerView); 
-
-    // SLIDER = new Glide(AppOptions.SLIDER_ID, {
-    //   type: 'slider',
-    //   perView: 4,
-    //   gap: AppOptions.CARUSEL_GAP,
-    //   keyboard: true,
-    //   rewind: false,
-    //   bound: true,
-    //   startAt: cntSlides - curPerView,
-    //   breakpoints: {
-    //     800: {
-    //       perView: 1
-    //     }
-    //   }
-    // })
-
-    // SLIDER.on('run.end', SearchMovies);
-
-    // SLIDER.mount();
-    showSlides();
+    nextDefaultSlides();    
     return;
   }
-  // console.log(searchString);
-
   
+  startAnimateSearching();
 
-  APP.getMovieCards(searchString);  
+  let promise = {};
 
-  showSlides();
+  if (Worker.isCyrilic(searchString)) {    
+    promise = APP.translateAndSearch(searchString);
+  } else {
+    promise = APP.getMovieCards(searchString);
+  }
+
+  promise 
+    .then(() => {
+      console.log(`searchMovies end =>`);      
+      updateSlider();
+    });
+
 }
 
 const setFocusOnInput = () => {
   document.getElementById('searchinput').focus();
 }
 
-const buildSlider = (startSlide = 0) => {
-  // if (SLIDER) {
-  //   SLIDER.destroy();
-  // }
+const buildSlider = () => {
+  SLIDER = new Swiper (AppOptions.SLIDER_CLASS, {
+    slidesPerView: 4,
+    // slidesOffsetBefore: 30,
+    // slidesOffsetAfter: 30,
+    // Optional parameters
+    direction: 'horizontal',
+    loop: false,
+    initialSlide: 0,
+    effect: 'slide', // "slide", "fade", "cube", "coverflow" or "flip"
+    watchOverflow: true,
+    spaceBetween: AppOptions.CARUSEL_GAP,
+    breakpoints: AppOptions.CARUSEL_BREAK_POINTS,
+    grabCursor: true,
 
-  SLIDER = new Glide(AppOptions.SLIDER_ID, {
-    type: 'slider',
-    perView: 4,
-    gap: AppOptions.CARUSEL_GAP,
-    keyboard: true,
-    rewind: false,
-    bound: true,
-    startAt: startSlide,
-    breakpoints: {
-      800: {
-        perView: 1
+
+    // experimental
+    observer: true,
+    roundLengths: true,
+    // preventInteractionOnTransition: true,
+    centerInsufficientSlides: true,
+
+
+    // If we need pagination
+    pagination: {
+      el: '.swiper-pagination',
+      type: 'bullets',
+      dynamicBullets: true,
+      clickable: true,
+      // dynamicMainBullets: 7
+    },
+
+    // Navigation arrows
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+
+    // // And if we need scrollbar
+    // scrollbar: {
+    //   el: '.swiper-scrollbar',
+    // },
+    on: {
+      reachEnd: () => {
+        console.log('onReachEnd');
+        if (APP.loadDefaultMovieCards) {
+          showMoreResults(); 
+          // updateSlider();
+        }          
       }
-    }
+    },
+    keyboard: {
+      enabled: true,
+      onlyInViewport: false,
+    },
   });
-  
-  // SLIDER.on('run.end', () => {
-  //   // console.log('reach end');
-  //   onSearchClick();
-  // })
-  // SLIDER.on('run.end', searchMovies);  
-  SLIDER.on('run.end', showMoreResults);  
-
-  SLIDER.mount({Html: HtmlFix});
 };
 
 
 const onKeyUp = (event) => {
   const { key } = event;
-  if (key !== 'Enter') {
-    // console.log(INPUT.value);
-    
+  if (key !== 'Enter') {    
     return;
   }
 
@@ -131,44 +183,41 @@ const onKeyUp = (event) => {
     return;
   } 
 
-  if (Worker.isCyrilic(searchString)) {
-    APP.translateAndSearch(searchString);
-    // if (!translate) {
-    //   APP.showError(`${AppOptions.DEFAULT_ERROR}${searchString}`);
-    // }
-    // searchString = translate;
-  }
-
-  // searchMovies();
-
-  showSlides();
+  startAnimateSearching();
+  // if (Worker.isCyrilic(searchString)) {    
+  //   APP.translateAndSearch(searchString);
+  // } else {
+  //   APP.getMovieCards(searchString);
+  // }
+  searchMovies();
 };
 
 const onClickSearch = () => {
   searchMovies();
 }
 
-const updateSlider = () => {
-  console.log('update slider');
-  
-  SLIDER.update();
-}
-
 const setHandlers = () => {
   document.getElementById('searchbtn').addEventListener('click', onClickSearch);
 
   document.addEventListener('keyup', onKeyUp);
-  document.getElementById('updateslider').addEventListener('click', updateSlider);
+  // document.getElementById('updateslider').addEventListener('click', updateSlider);
   // document.addEventListener('keydown', onKeyDown);
+
+
+
 }
 
 
 window.onload = () => {
   setHandlers();
-  APP = new MovieSearch(AppOptions.SLIDES);
+  buildSlider();
+  APP = new MovieSearch(SLIDER);
   APP.loadDefaultMovieCards();
   INPUT = document.getElementById('searchinput');
-  buildSlider();
+  
   setFocusOnInput();
   showSlides();
+
+
+
 }

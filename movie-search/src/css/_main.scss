@@ -1,14 +1,28 @@
+.main {
+  padding-top: 50px;
+  min-height: 800px;
+  box-sizing: border-box;
+
+  background: #141E30;
+  background: -webkit-linear-gradient(to right, #243B55, #141E30); 
+  background: linear-gradient(to right, #243B55, #141E30);
+
+}
+
 .search-bar {
   width: 100%;
   display: flex;
   position: relative;
-  margin: 50px 0 0;
+  @include media-laptop {
+    width: 94%;
+    margin: 0 auto;
+  }
 }
 
 .search-input {
   width: 100%;
   height: 60px;   
-  padding: 0 60px;
+  padding: 0 90px 0 60px;
   font-family: "Comfortaa", sans-serif;
   font-size: 2rem;
   
@@ -17,7 +31,8 @@
   color: #9DBFAF;
   border-right: none;
   border: 3px solid #00b4cc;
-  &:focus, &:hover {
+  &:focus, 
+  &:hover {
     color: #00b4cc;
   }
   &::-webkit-search-cancel-button {
@@ -30,7 +45,7 @@
   border: 1px solid $color-search;
   background: $color-search;
   text-align: center;
-  color: #fff;
+  color: $color-btn-text;
   border-radius: 0 5px 5px 0;
   cursor: pointer;
   font-size: 20px;
@@ -67,13 +82,38 @@
   }
 }
 
+.loupe-searching {
+  animation: seconds infinite 1s;
+}
+
+@keyframes seconds {
+  0% {
+      transform: scale(1);
+  }
+  17% {
+      transform: scale(.85);
+  }
+  33% {
+      transform: scale(.65);
+  }
+  50% {
+    transform: scale(.5);
+  }
+  66% {
+    transform: scale(.65);
+  }
+  83% {
+    transform: scale(.85);
+  }
+  100% {
+      transform: scale(1);
+  }
+}
+
 .error-bar {
-  // height: 30px;
   margin: 20px 0 30px;
 
-  // background-color: orange;
   &__text {
-    // display: block;
     max-width: 90%;
     height: 30px;
     margin: 0 auto;
@@ -82,7 +122,25 @@
     text-align: center;
     color: $color-error;
     @extend %text-overflow;
+  }
+}
 
-    // background-color: rgb(247, 245, 247);
+.keyboard {
+  display: inline-block;
+  width: 61px;
+  height: 57px;
+  position: absolute;
+  bottom: 2px;
+  right: 86px;
+  content: "";
+  background: url("../img/icons/keyboard.svg") no-repeat ;
+  background-size: contain;
+  cursor: pointer;
+  @extend %transition;
+  &:hover {
+    transform: scale(1.1);
+  }
+  @include media-tablet {
+    display: none;
   }
 }

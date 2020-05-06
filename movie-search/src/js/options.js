@@ -1,14 +1,31 @@
 export const START_APP_MOVIES = ['star wars, the lord of the rings', 'bad boys', 'shrek'];
 export const CARUSEL_PREVIEW_SIZE = 4;
 export const CARUSEL_GAP = 15;
+export const CARUSEL_BREAK_POINTS = {
+  1020: {
+    slidesPerView: 4
+  },
+  800: {
+    slidesPerView: 3
+  },
+  440: {
+    slidesPerView: 2
+  },
+  280: {
+    slidesPerView: 1
+  },
+};
+
+
 
 export const OMDB_API_KEY = 'de7dcb59';
 export const YANDEX_API_KEY = 'trnsl.1.1.20200502T123304Z.3dbd097eb78d1bbf.b5c08113e975f90115b6ad1af75b4ff78817285f';
 
-export const SLIDER_ID = '#glide';
+export const SLIDER_CLASS = '.swiper-container';
 export const SLIDES = 'slides';
 export const NO_POSTER = '../img/noposter.png';
 export const DEFAULT_ERROR = 'No results for ';
+export const DEFAULT_MESSAGE = 'Showing results for ';
 
 
 export const OMDB_API_URL = 'https://www.omdbapi.com/?apikey=';
@@ -33,4 +50,4 @@ export const rndreq = [
 
 
 // options for save API key limit
-export const RATING_ON = true; 
+export const RATING_ON = false; 

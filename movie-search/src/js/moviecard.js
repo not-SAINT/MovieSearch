@@ -11,20 +11,23 @@ export default class MovieCard {
 
   render(rating) {
     const rate = rating || '-/10';
-    const card = createDomElement('div', 'movie-card');
-    // card.classList.add('movie-card__hide');
-    card.id = this.imdbID;
+    // onerror="this.src = 'img/image-not-found.gif' "
+    // const poster = (this.poster !== 'N/A' && isValidImgSrc(this.poster, this.imdbID)) ? this.poster : AppOptions.NO_POSTER;
+    const poster = (this.poster !== 'N/A') ? this.poster : AppOptions.NO_POSTER;
+    const noPoster = ` onerror="this.src = '${AppOptions.NO_POSTER}'" `;
+    const card = createDomElement('div', 'swiper-slide');
 
-    const cardInnerHtml = `<h2 class="movie-card__title">
-        <a href="${AppOptions.MOVIE_URL}${this.imdbID}" class="movie-card__link" target="_blank">${this.title}</a>
+    const cardInnerHtml = `<div class="movie-card" id="${this.imdbID}">
+      <h2 class="movie-card__title">
+        <a href="${AppOptions.MOVIE_URL}${this.imdbID}/videogallery" title="${this.title}" class="movie-card__link" target="_blank">${this.title}</a>
       </h2>
-      <img class="movie-card__poster" src="${this.poster}" alt="${this.title}">
+      <img class="movie-card__poster" src="${poster}" alt="${this.title}" ${noPoster}>
       <span class="movie-card__year">${this.year}</span>
-      <span class="movie-card__rating">${rate}</span>`;
+      <span class="movie-card__rating">${rate}</span>
+      </div>`;
 
     card.innerHTML = cardInnerHtml;
 
     return card;
   }
 }
-
