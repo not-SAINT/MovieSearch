@@ -17,7 +17,7 @@ export default class MovieCard {
     const noPoster = ` onerror="this.src = '${AppOptions.NO_POSTER}'" `;
     const card = createDomElement('div', 'swiper-slide');
 
-    const cardInnerHtml = `<div class="movie-card" id="${this.imdbID}">
+    const cardInnerHtml = `<div class="movie-card" slideid="${this.imdbID}">
       <h2 class="movie-card__title">
         <a href="${AppOptions.MOVIE_URL}${this.imdbID}/videogallery" title="${this.title}" class="movie-card__link" target="_blank">${this.title}</a>
       </h2>

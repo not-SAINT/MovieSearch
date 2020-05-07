@@ -125,7 +125,7 @@
   }
 }
 
-.keyboard {
+.keyboard-ico {
   display: inline-block;
   width: 61px;
   height: 57px;
@@ -142,5 +142,17 @@
   }
   @include media-tablet {
     display: none;
+  }
+}
+
+.simple-keyboard {
+  position: absolute;
+  z-index: 10;
+  top: 64px;
+  opacity: 1;
+  @extend %transition;
+  &__hide {
+    display: none;
+    opacity: 0;
   }
 }

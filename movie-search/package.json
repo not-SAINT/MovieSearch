@@ -50,6 +50,8 @@
   "dependencies": {
     "core-js": "^3.4.7",
     "regenerator-runtime": "^0.13.3",
+    "simple-keyboard": "^2.29.18",
+    "simple-keyboard-layouts": "^1.12.82",
     "swiper": "^5.3.8"
   }
 }

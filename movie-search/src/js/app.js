@@ -6,6 +6,16 @@ const endSearching = () => {
   document.getElementById('loupe').classList.remove('loupe-searching');
 }
 
+const showSlides = () => {
+  
+  setTimeout(() => {
+    console.log('show delay');
+    document.querySelectorAll('.movie-card').forEach(n => n.classList.add('movie-card__show'));
+  }, 0);
+  console.log('slides showwwwwwwwww APP');
+  
+}
+
 export default class MovieSearch {
   constructor(slider) {
     this.slider = slider;    
@@ -16,45 +26,66 @@ export default class MovieSearch {
     this.lastSearchText = '';
     this.lastSearchPageCount = 0;
     // this.searchString = '';
+    this.isCyrillicSearch = false;
   }
 
-  async getMovieDetails (movieId) {
-    const rating = document.getElementById(movieId).lastChild;
-    rating.innerText = `x/10`;
+  setMovieRating(movie) {
     try {
-      
-      // console.log(`ID = ${movieId} start get rating`);
-      const searchUrl = `${AppOptions.OMDB_API_URL}${AppOptions.OMDB_API_KEY}&i=${movieId}`;
-      const res = await fetch(searchUrl);
-      const data = await res.json();
-      
-      // console.log(`ID = ${movieId} rating = ${rating}`);
-      if (data.imdbRating) {
-        // console.log(`ID = ${movieId} rating = ${data.imdbRating}`);
-        
-        rating.innerText = `${data.imdbRating}/10`;
+        const cards = document.querySelectorAll(`[slideid=${movie.imdbID}]`);
+        cards.forEach(card => {
+        const cardMovie = card;
+        cardMovie.lastElementChild.innerText = `${movie.imdbRating}/10`
+      });
+    }
+    catch (e) {
+      this.showError(e);
+    }    
+  }
 
-        // console.log(`ID = ${movieId} after = ${rating.innerText}`);
-      }      
-    } catch (e) {
-      console.log(`getMovieDetails error => ${e}`);
-      
+  async getMovieRatings(movieIDs) {
+    try {
+      const movies = [];
+      movieIDs.forEach ( id => {
+        const movie = fetch(`${AppOptions.OMDB_API_URL}${AppOptions.OMDB_API_KEY}&i=${id}`)
+                    .then(
+                      (successResponse) => {
+                        if (successResponse.status !== 200) {
+                          return null;
+                        }                         
+                        return successResponse.json();                        
+                      },
+                      () => {
+                        return null;
+                      }
+                    );
+        movies.push(movie);
+      })
+
+      Promise.allSettled(movies).
+        then((results) => {
+          results.forEach(movie => this.setMovieRating(movie.value))
+        });
+    } catch (e) {      
       this.showError(e);
     }
   }
 
-  addNewSlides (arr) {
+  addNewSlides(arr) {
     const newSlides = [];
-    arr.forEach((n) => {
-      const card = new MovieCard(n);
-      // this.slidesContainer.append(card.render());
+    const movieIDs = [];
+    arr.forEach((movie) => {
+      const card = new MovieCard(movie);
       newSlides.push(card.render());
+      movieIDs.push(movie.imdbID);
       
-      // if (AppOptions.RATING_ON) {
-      //   this.getMovieDetails(n.imdbID);
-      // }
     });
-    this.slider.appendSlide(newSlides);
+
+    if (AppOptions.RATING_ON) {
+      this.getMovieRatings(movieIDs);
+    }
+    
+    this.slider.appendSlide(newSlides);   
+    // showSlides(); 
   }
 
   showError(msg) {
@@ -76,6 +107,7 @@ export default class MovieSearch {
 
     this.errorfield.innerText = '';
     this.addNewSlides(arr);
+    showSlides();
   }
 
   async translateAndSearch (text) {
@@ -90,21 +122,17 @@ export default class MovieSearch {
         [ this.lastSearchText ] = data.text;
         // console.log(`translate res = ${this.lastSearchText}`);
         this.errorfield.innerText = `${AppOptions.DEFAULT_MESSAGE}${this.lastSearchText}`;
-        this.getMovieCards(this.lastSearchText);
+        // this.getMovieCards(this.lastSearchText);
       } 
-        // 
-      // return 1;
-            
 
     } catch (e) {
       console.log(`translateAndSearch error => ${e}`);
       endSearching();
       this.showError(e);
     }
-    // return 1;
   }
  
-  async getMovieCards (searchString, nextPage = false) {
+  async getMovieCards (search, nextPage = false) {
     // try {      
       this.currPage = nextPage ? this.currPage + 1 : 1;
 
@@ -114,24 +142,32 @@ export default class MovieSearch {
         endSearching();
         return;
       }
+      console.log(`APP.isCyrillicSearch =>> ${this.isCyrillicSearch}`);
 
+      if (!(nextPage || this.isCyrillicSearch)) {
+        console.log(`APP.getMovieCards =>> 1111`);
+        this.lastSearchText = search; 
+        this.clearError();
+      }
+
+      const searchString = this.lastSearchText;
       const searchUrl = `${AppOptions.OMDB_API_URL}${AppOptions.OMDB_API_KEY}&page=${this.currPage}&s=${searchString}`;
       const res = await fetch(searchUrl);
-      const data = await res.json();
+      const data = await res.json();     
     
 
     
       // {"Response":"False","Error":"Too many results."}
       if (data.Error && this.currPage === 1) {
         // this.errorfield.innerText = `${AppOptions.DEFAULT_ERROR}${searchString}. ${data.Error}`;
-        const inputText = document.getElementById('searchinput').value;
-        this.showError(`${AppOptions.DEFAULT_ERROR}${inputText}. ${data.Error}`);
+        // const inputText = document.getElementById('searchinput').value;
+        this.showError(`${AppOptions.DEFAULT_ERROR}${this.lastSearchText}. ${data.Error}`);
         endSearching();
         // console.log(data.Error);
         return;
       }
       
-      this.clearError();      
+            
 
       // убрать когда будет сделан учет всех результатов
       // if (data.Error) {
@@ -152,6 +188,7 @@ export default class MovieSearch {
         }        
         this.addNewSlides(data.Search);
         endSearching();
+        showSlides();
       }
 
     // } catch (e) {
