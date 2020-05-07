@@ -10,7 +10,8 @@
     "dev": "webpack-dev-server --history-api-fallback --inline --open",
     "build": "npm run clear -s && webpack --progress",
     "lint": "eslint ./**/*.js",
-    "clear": "del-cli dist"
+    "clear": "del-cli dist",
+    "test": "jest"
   },
   "author": "notSAINT",
   "license": "ISC",
@@ -37,6 +38,7 @@
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "image-webpack-loader": "^6.0.0",
+    "jest": "^26.0.1",
     "mini-css-extract-plugin": "^0.8.0",
     "node-sass": "^4.13.1",
     "postcss-loader": "^3.0.0",
@@ -50,8 +52,6 @@
   "dependencies": {
     "core-js": "^3.4.7",
     "regenerator-runtime": "^0.13.3",
-    "simple-keyboard": "^2.29.18",
-    "simple-keyboard-layouts": "^1.12.82",
     "swiper": "^5.3.8"
   }
 }
