@@ -140,19 +140,35 @@
   &:hover {
     transform: scale(1.1);
   }
-  @include media-tablet {
+  @include media-keyboard {
     display: none;
   }
 }
 
-.simple-keyboard {
+.keyboard-wrapper {
+  width: 930px;
+  height: 300px;
+  padding: 5px 0;
+  display: flex;
   position: absolute;
-  z-index: 10;
-  top: 64px;
+  z-index: 20;
+  top: 111px;
+  right: calc((100% - 930px) / 2);
+  justify-content: space-between;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  border-radius: 10px;
+  background-color: #4a5049;
+  -webkit-box-shadow: 0px 0px 11px 10px $color-keyboard-shadow; 
+  box-shadow: 0px 0px 11px 10px $color-keyboard-shadow;
   opacity: 1;
   @extend %transition;
+
   &__hide {
     display: none;
     opacity: 0;
+  }
+  @include media-keyboard {
+    display: none;
   }
 }

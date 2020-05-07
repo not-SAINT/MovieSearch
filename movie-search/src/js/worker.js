@@ -7,14 +7,14 @@ export const createDomElement = (elementName = 'div', className) => {
   return newElement;  
 }
 
-export const addClassToElement = (selector, className, flag) => {
+export const addClassToElement = (selector, className) => {
   document.querySelector(selector).classList.add(className);
-  return !flag;
+  return true;
 }
 
-export const removeClassToElement = (selector, className, flag) => {
+export const removeClassToElement = (selector, className) => {
   document.querySelector(selector).classList.remove(className);
-  return !flag;
+  return false;
 }
 
 export const getRandomIndex = (length) => {

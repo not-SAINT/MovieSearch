@@ -4,25 +4,20 @@
 // import '@/../node_modules/swiper/css/swiper.min.css';
 
 import '../css/swiper.min.css';
+import '../css/keyboard.css';
 import '../css/style.css';
 import '../css/style.scss';
 
 import Swiper from 'swiper';
-import Keyboard from 'simple-keyboard';
-import keyboardLayoutRus from "simple-keyboard-layouts/build/layouts/russian";
-// import keyboardLayoutEng from "simple-keyboard-layouts/build/layouts/english";
 import * as AppOptions from './options';
 import * as Worker from './worker';
 import MovieSearch from './app';
-
-import 'simple-keyboard/build/css/index.css';
+import createKeyboard from './keyboard';
 
 let APP = {};
 let SLIDER = {};
 let INPUT = {};
-// let KEYBOARD;
-// let KEYBOARD_SHOW = false;
-// let KEYBOARD_LANG = false;
+let KEYBOARD_SHOW = true;
 
 // const hideSlides = () => {
 //   document.querySelectorAll('.movie-card').forEach(n => n.classList.add('movie-card__hide'));
@@ -42,15 +37,15 @@ const hideSlides = () => {
   document.querySelectorAll('.movie-card').forEach(n => n.classList.remove('movie-card__show'));
 }
 
-// const hideKeyboard = () => {
-//   document.getElementById('keyboard').classList.add('simple-keyboard__hide');
-//   KEYBOARD_SHOW = true;
-// }
+const hideKeyboard = () => {
+  document.getElementById('keyboard').classList.add('keyboard-wrapper__hide');
+  KEYBOARD_SHOW = true;
+}
 
-// const showKeyboard = () => {
-//   document.getElementById('keyboard').classList.remove('simple-keyboard__hide');
-//   KEYBOARD_SHOW = false;
-// }
+const showKeyboard = () => {
+  document.getElementById('keyboard').classList.remove('keyboard-wrapper__hide');
+  KEYBOARD_SHOW = false;
+}
 
 const updateSlider = () => {
   console.log('update slider');  
@@ -277,90 +272,33 @@ const onClickSearch = () => {
   searchMovies();
 }
 
+const onKeyPressKeyboard = () => {
+  searchMovies();
+  hideKeyboard();
+}
 
-// // keyboard
-// function handleShiftKeyboard() {
-//   const currentLayout = KEYBOARD.options.layoutName;
-//   const shiftToggle = currentLayout === "default" ? "shift" : "default";
+const onKeyboardIcoClick = () => {
+  if (!KEYBOARD_SHOW) {
+    hideKeyboard();    
+  } else {
+    showKeyboard();    
+  }  
+}
 
-//   KEYBOARD.setOptions({
-//     layoutName: shiftToggle
-//   });
-// }
+const closeVirtualKeyboard = ({target}) => {
+  const keyboardIco = target.closest('.keyboard-ico');
+  const keyboardBase = target.closest('.keyboard-wrapper');
 
-// function onChangeKeyboard(input){
-//   document.querySelector(".search-input").value = input;
-//   KEYBOARD.setInput(input);
-//   // console.log("Input changed", input);
-// }
+  if (!(keyboardIco || keyboardBase)) {
+    hideKeyboard();
+  }  
+}
 
-// const changeVirtualKeyboardLang = () => {
-//   if (KEYBOARD) {   
-//     if (KEYBOARD_LANG) {
-//       KEYBOARD.setOptions({
-//         layout: AppOptions.keyboardLayoutEng
-//       });
-//       KEYBOARD_LANG = false;
-//     } else {
-//       KEYBOARD.setOptions({
-//         layout: AppOptions.keyboardLayoutRus
-//       });
-//       KEYBOARD_LANG = true;
-//     }    
-//     // document.querySelector('[data-skbtn="{switchLang}"]').classList.add('{switchLang}');
-//   }
-// }
-
-// function onKeyPressKeyboard(button){
-//   // console.log("Button pressed", button);
-//   if (button === "{shift}" || button === "{lock}") {
-//     handleShiftKeyboard();
-//   } 
-//   if (button === '{switchLang}') {
-//     // document.getElementById('test').click();  
-//     changeVirtualKeyboardLang(); 
-//   }
-//   if (button === '{enter}') {
-//     onKeyUp({key: 'Enter'});
-//   }
-// }
-
-// const onKeyboardClick = () => {
-//   // console.log('click keyboard');
-
-//   if (!KEYBOARD) {
-//     KEYBOARD = new Keyboard({
-//       onChange: input => onChangeKeyboard(input),
-//       onKeyPress: button => onKeyPressKeyboard(button),
-//       layout: AppOptions.keyboardLayoutEng,
-//       syncInstanceInputs: true,
-//       mergeDisplay: true,
-//       display: {
-//         '{switchLang}': 'En-Ru',
-//         '{space}': 'space',
-//       }
-//     });
-//     KEYBOARD_SHOW = true;    
-//   }
-
-//   if (KEYBOARD_SHOW) {
-//     showKeyboard();
-    
-//   } else {
-//     hideKeyboard();
-//   }  
-// }
-
-// const closeVirtualKeyboard = ({target}) => {
-//   const keyboardIco = target.closest('.keyboard-ico');
-//   // const keyboardIco = target.closest('span');
-//   const keyboardBase = target.closest('.simple-keyboard');
-
-//   // if (!((keyboardIco && keyboardIco.classList.contains('keyboard-ico')) || (keyboardBase))) {
-//   if (!(keyboardIco || keyboardBase)) {
-//     hideKeyboard();
-//   }  
-// }
+const onTest = () => {
+  console.log('click test');
+  
+  createKeyboard('.keyboard-wrapper', '.search-input');
+}
 
 const setHandlers = () => {
   document.getElementById('searchbtn').addEventListener('click', onClickSearch);
@@ -368,26 +306,21 @@ const setHandlers = () => {
   document.addEventListener('keyup', onKeyUp);
 
   // document.querySelector('.swiper-button-next').addEventListener('click', onSlideMoveNext);
-  // document.getElementById('keyboardico').addEventListener('click', onKeyboardClick);
+  document.getElementById('keyboardico').addEventListener('click', onKeyboardIcoClick);
+  document.getElementById('enter').addEventListener('click', onKeyPressKeyboard);
 
-  // document.addEventListener('click', closeVirtualKeyboard);
-
-  // document.querySelector('.search-input').addEventListener('input', () => {
-  //   if (KEYBOARD) {
-  //     const inputText = document.querySelector('.search-input').value;
-  //     KEYBOARD.setInput(inputText);
-  //   }  
-  // });
+  document.addEventListener('click', closeVirtualKeyboard);
   
   // document.addEventListener('keydown', onKeyDown);
 
   // document.getElementById('test').addEventListener('click', onTest);
 
+
 }
 
 
 window.onload = () => {
-  setHandlers();
+  
   buildSlider();
   APP = new MovieSearch(SLIDER);
   APP.loadDefaultMovieCards();
@@ -395,4 +328,10 @@ window.onload = () => {
   
   setFocusOnInput();
   showSlides();
+
+  createKeyboard('.keyboard-wrapper', '.search-input');
+
+  setHandlers();
+
+  // KEYBOARD_SHOW = Worker.addClassToElement('#keyboard', 'keyboard-wrapper__hide');
 }
