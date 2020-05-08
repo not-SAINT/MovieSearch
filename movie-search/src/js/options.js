@@ -41,5 +41,5 @@ export const rndreq = [
 ];
 
 // options for save API key limit
-export const RATING_ON = false; 
-export const SAVEAPIKEY_MODE_ON = true; 
+export const RATING_ON = true; 
+export const SAVEAPIKEY_MODE_ON = false; 

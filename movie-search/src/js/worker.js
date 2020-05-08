@@ -25,19 +25,13 @@ export const isCyrilic = (text) => {
   return /[а-яё]/i.test(text);
 }
 
-export const saveToLocalStorage = (key, value) => {
-  console.log(`saveToLocalStorage ${key} ${value}`);
-  
+export const saveToLocalStorage = (key, value) => {  
   const serialObj = JSON.stringify(value);
   localStorage.setItem(key, serialObj);
 };
 
-export const restoreFromLocalStorage = (key) => {
-  console.log(`restoreFromLocalStorage`);
-  
-  if (localStorage.getItem(key)) {
-    console.log(`restoreFromLocalStorage ${key} ${localStorage.getItem(key)}`);
-  
+export const restoreFromLocalStorage = (key) => {  
+  if (localStorage.getItem(key)) {  
     return JSON.parse(localStorage.getItem(key));
   }  
   return undefined;

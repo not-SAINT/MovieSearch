@@ -100,9 +100,7 @@ export default class MovieSearch {
       this.loadSavedMovieCards();
     } else {
       const index = Worker.getRandomIndex(AppOptions.START_APP_MOVIES.length);
-      const defaultSearchText = previosSearchText || AppOptions.START_APP_MOVIES[index];
-      console.log(`defaultSearchText = ${defaultSearchText}`);
-      
+      const defaultSearchText = previosSearchText || AppOptions.START_APP_MOVIES[index];     
 
       this.getMovieCards(defaultSearchText);  
     }      
@@ -118,14 +116,10 @@ export default class MovieSearch {
       if (data.code === 200 && data.text) {   
         this.currPage = 1;            
         [ this.lastSearchText ] = data.text;
-        // console.log(`translate res = ${this.lastSearchText}`);
         this.errorfield.innerText = `${AppOptions.DEFAULT_MESSAGE}${this.lastSearchText}`;
-        // this.getMovieCards(this.lastSearchText);
       } 
 
     } catch (e) {
-      console.log(`translateSearchText error => ${e}`);
-      Animation.endSearching();
       this.showError(e);
     }
   }
@@ -134,16 +128,13 @@ export default class MovieSearch {
     try {      
       this.currPage = nextPage ? this.currPage + 1 : 1;
 
-      // current search reached end
+      // current search has reached end
       if (this.currPage !== 1 && this.currPage > this.lastSearchPageCount) {
-        console.log(`results reach end`);
         Animation.endSearching();
         return;
       }
-      console.log(`APP.isCyrillicSearch =>> ${this.isCyrillicSearch}`);
 
       if (!(nextPage || this.isCyrillicSearch)) {
-        console.log(`APP.getMovieCards =>>  search = ${search} this.currPage = ${this.currPage}`);
         this.lastSearchText = search; 
         this.clearError();
       }
@@ -151,41 +142,23 @@ export default class MovieSearch {
       const searchString = this.lastSearchText;
       const searchUrl = `${AppOptions.OMDB_API_URL}${AppOptions.OMDB_API_KEY}&page=${this.currPage}&s=${searchString}`;
       const res = await fetch(searchUrl);
-      const data = await res.json();     
-    
+      const data = await res.json();   
 
-    
-      // {"Response":"False","Error":"Too many results."}
       if (data.Error && this.currPage === 1) {
-        // this.errorfield.innerText = `${AppOptions.DEFAULT_ERROR}${searchString}. ${data.Error}`;
-        // const inputText = document.getElementById('searchinput').value;
         this.showError(`${AppOptions.DEFAULT_ERROR}${this.lastSearchText}. ${data.Error}`);
+
         Animation.endSearching();
-        // console.log(data.Error);
         return;
       }
-      
-            
 
-      // убрать когда будет сделан учет всех результатов
-      // if (data.Error) {
-      //   return;
-      // }
-      this.lastRequestResult = data.Search.length;      
-
-      console.log(` lastRequestResult ${data.Search.length}`);
-      console.log(` this.currPage ${  this.currPage}`);
-      
+      this.lastRequestResult = data.Search.length;     
 
       if (this.lastRequestResult) {
         if (this.currPage === 1) {
-          // this.slidesContainer.innerHTML = '';
           this.slider.removeAllSlides();
           this.slider.update();
-
-
           this.lastSearchPageCount = Math.ceil(data.totalResults / 10);
-          console.log(`this.lastSearchPageCount = ${this.lastSearchPageCount}`);   
+
           Worker.saveToLocalStorage(AppOptions.LAST_SEARCH_KEY, { 'lastSearchText': this.lastSearchText });
         }        
         this.addNewSlides(data.Search);
@@ -194,7 +167,7 @@ export default class MovieSearch {
       }
 
     } catch (e) {
-      console.log(`getMovieCards error => ${e}`);
+      Animation.endSearching();
       this.showError(e);
     }
   }
