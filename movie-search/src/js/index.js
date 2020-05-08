@@ -10,6 +10,7 @@ import '../css/style.scss';
 
 import Swiper from 'swiper';
 import * as AppOptions from './options';
+import * as Animation from './animation';
 import * as Worker from './worker';
 import MovieSearch from './app';
 import createKeyboard from './keyboard';
@@ -19,83 +20,26 @@ let SLIDER = {};
 let INPUT = {};
 let KEYBOARD_SHOW = true;
 
-// const hideSlides = () => {
-//   document.querySelectorAll('.movie-card').forEach(n => n.classList.add('movie-card__hide'));
-// }
-
-const showSlides = () => {
-  document.querySelectorAll('.movie-card').forEach(n => n.classList.add('movie-card__show'));
-  // setTimeout(() => {
-  //   console.log('show delay');
-    
-  // }, 10000);
-  console.log('slides showwwwwwwwww ');
-  
-}
-
-const hideSlides = () => {
-  document.querySelectorAll('.movie-card').forEach(n => n.classList.remove('movie-card__show'));
-}
-
-const hideKeyboard = () => {
-  document.getElementById('keyboard').classList.add('keyboard-wrapper__hide');
-  KEYBOARD_SHOW = true;
-}
-
-const showKeyboard = () => {
-  document.getElementById('keyboard').classList.remove('keyboard-wrapper__hide');
-  KEYBOARD_SHOW = false;
-}
-
-const updateSlider = () => {
-  console.log('update slider');  
-  
-  // SLIDER.update();
-  // SLIDER.navigation.update();
-  // showSlides();
-}
-
-const startAnimateSearching = () => {
-  document.getElementById('loupe').classList.add('loupe-searching');
-}
-
-// const nextSlide = () => {
-//   if (APP.currPage < APP.lastSearchPageCount) {
-//     SLIDER.slideNext();
-//   }
-// }
-
-const nextDefaultSlides = () => {
-  APP.loadDefaultMovieCards();
-  // updateSlider();
-  // showSlides();
-  // nextSlide();
-}
-
-
 const showMoreResults = () => {    
+  if (AppOptions.SAVEAPIKEY_MODE_ON) {
+    console.log(`index.js => load dev mode`);
+    
+    APP.loadDefaultMovieCards();
+    return;
+  }
   console.log('showMoreResults =>');
   
   const searchString = INPUT.value;
 
   console.log(`showMoreResults searchString => ${searchString}`);
 
-  if (!searchString) {
-    console.log(`index.lastSearchText = ${APP.lastSearchText}`);
-    
-    if (!APP.lastSearchText) {
-      nextDefaultSlides();
-    }    
-    return;
-  }
-
-  startAnimateSearching();
+  Animation.startAnimateSearching();
   
   APP.getMovieCards(searchString, true)
     .then( () => {
       console.log(`after showMoreResults =>`);
       
-      updateSlider();
+      // updateSlider();
       
       // SLIDER.navigation.update();
       // nextSlide();
@@ -106,18 +50,19 @@ const showMoreResults = () => {
 
 const searchMovies = async () => {
   const searchString = document.getElementById('searchinput').value; 
-  hideSlides();
-  // hideKeyboard(); 
+  
+  // KEYBOARD_SHOW = Animation.hideKeyboard(); 
   
   if (!searchString) {
     console.log(`APP.lastSearchTex = ${APP.lastSearchTex}`);
-    if (!APP.lastSearchText) {
-      nextDefaultSlides();
-    }    
+    // if (!APP.lastSearchText) {
+    //   nextDefaultSlides();
+    // }    
     return;
   }
-  
-  startAnimateSearching();
+
+  Animation.hideSlides();  
+  Animation.startAnimateSearching();
   // APP.lastSearchText = searchString;
 
   let promise = {};
@@ -125,7 +70,7 @@ const searchMovies = async () => {
 
   if (Worker.isCyrilic(searchString)) {    
     APP.isCyrillicSearch = true;
-    promise = await APP.translateAndSearch(searchString);
+    promise = await APP.translateSearchText(searchString);
     console.log(`translate run`);
   }
    else {
@@ -141,28 +86,12 @@ const searchMovies = async () => {
   promise 
     .then(() => {
       console.log(`searchMovies after promise end =>`);      
-      updateSlider();
-      // showSlides();
+      // updateSlider();
+      // Animation.showSlides();
       console.log(`searchMovies after updateSlider end =>`);
     });
-  showSlides();
+  Animation.showSlides();
   console.log(`searchMovies _____________ end =>`); 
-
-  //  if (Worker.isCyrilic(searchString)) {    
-  //   promises.add(APP.translateAndSearch(searchString));
-  //   console.log(`translate run`);    
-  // } else {
-  //   promises.add(APP.getMovieCards(searchString));
-  // }
-
-  // Promise.all(promises) 
-  //   .then(() => {
-  //     console.log(`searchMovies after promise end =>`);      
-  //     updateSlider();
-  //     console.log(`searchMovies after updateSlider end =>`);
-  //   });
-  // showSlides();
-  // console.log(`searchMovies after showSlides end =>`); 
 }
 
 const setFocusOnInput = () => {
@@ -171,11 +100,17 @@ const setFocusOnInput = () => {
 
 
 const isNeedPreloadSlides = () => {
-  // 4 5 10 => true
   const allSlides = SLIDER.slides.length;
   const currSlide = SLIDER.activeIndex;
 
+  console.log(`isNeedPreloadSlides ---- allSlides = ${allSlides} currSlide = ${currSlide}`);
+  if (allSlides === 0) {
+    return false;
+  }
+
   if (allSlides - currSlide <= SLIDER.params.slidesPerView + AppOptions.CARUSEL_PRELOAD_INDEX) {
+    console.log(`isNeedPreloadSlides ---- ${allSlides - currSlide} <= ${SLIDER.params.slidesPerView + AppOptions.CARUSEL_PRELOAD_INDEX}`);
+    
     return true;
   }
 
@@ -218,21 +153,8 @@ const buildSlider = () => {
       nextEl: '.swiper-button-next',
       prevEl: '.swiper-button-prev',
     },
-
-    // // And if we need scrollbar
-    // scrollbar: {
-    //   el: '.swiper-scrollbar',
-    // },
     on: {
-      // reachEnd: () => {
-      //   console.log('onReachEnd');
-      //   if (APP.loadDefaultMovieCards) {
-      //     showMoreResults(); 
-      //     // updateSlider();
-      //   }          
-      // },
       slideChange: () => {
-        // console.log('slideChange=>');
         console.log(`SLIDER.activeIndex = ${SLIDER.activeIndex}`);
         if (isNeedPreloadSlides()) {
           console.log('isNeedPreloadSlides');    
@@ -259,12 +181,6 @@ const onKeyUp = (event) => {
     return;
   } 
 
-  startAnimateSearching();
-  // if (Worker.isCyrilic(searchString)) {    
-  //   APP.translateAndSearch(searchString);
-  // } else {
-  //   APP.getMovieCards(searchString);
-  // }  
   searchMovies();
 };
 
@@ -274,14 +190,14 @@ const onClickSearch = () => {
 
 const onKeyPressKeyboard = () => {
   searchMovies();
-  hideKeyboard();
+  KEYBOARD_SHOW = Animation.disappearKeyboard();
 }
 
 const onKeyboardIcoClick = () => {
   if (!KEYBOARD_SHOW) {
-    hideKeyboard();    
+    KEYBOARD_SHOW = Animation.disappearKeyboard();    
   } else {
-    showKeyboard();    
+    KEYBOARD_SHOW = Animation.showKeyboard();    
   }  
 }
 
@@ -290,48 +206,51 @@ const closeVirtualKeyboard = ({target}) => {
   const keyboardBase = target.closest('.keyboard-wrapper');
 
   if (!(keyboardIco || keyboardBase)) {
-    hideKeyboard();
+    KEYBOARD_SHOW = Animation.disappearKeyboard();
   }  
 }
 
-const onTest = () => {
-  console.log('click test');
-  
-  createKeyboard('.keyboard-wrapper', '.search-input');
+const onKeyboardTransitionend = () => {
+  if (KEYBOARD_SHOW) {
+    Animation.hideKeyboard();  
+  }   
 }
 
 const setHandlers = () => {
   document.getElementById('searchbtn').addEventListener('click', onClickSearch);
-
   document.addEventListener('keyup', onKeyUp);
-
-  // document.querySelector('.swiper-button-next').addEventListener('click', onSlideMoveNext);
   document.getElementById('keyboardico').addEventListener('click', onKeyboardIcoClick);
   document.getElementById('enter').addEventListener('click', onKeyPressKeyboard);
-
   document.addEventListener('click', closeVirtualKeyboard);
   
   // document.addEventListener('keydown', onKeyDown);
 
-  // document.getElementById('test').addEventListener('click', onTest);
+  document.getElementById('keyboard').addEventListener('transitionend', onKeyboardTransitionend);
 
 
 }
-
 
 window.onload = () => {
   
   buildSlider();
   APP = new MovieSearch(SLIDER);
-  APP.loadDefaultMovieCards();
+  const restoredObject = Worker.restoreFromLocalStorage(AppOptions.LAST_SEARCH_KEY);
+
+  // console.log(restoredObject.lastSearchText);
+
+  if (restoredObject) {
+    APP.loadDefaultMovieCards(restoredObject.lastSearchText);
+  } else {
+    APP.loadDefaultMovieCards();
+  }
+  
+  
   INPUT = document.getElementById('searchinput');
   
   setFocusOnInput();
-  showSlides();
+  Animation.showSlides();
 
   createKeyboard('.keyboard-wrapper', '.search-input');
 
   setHandlers();
-
-  // KEYBOARD_SHOW = Worker.addClassToElement('#keyboard', 'keyboard-wrapper__hide');
 }

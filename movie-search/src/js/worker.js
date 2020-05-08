@@ -22,32 +22,23 @@ export const getRandomIndex = (length) => {
 }
 
 export const isCyrilic = (text) => {
-  return /[а-я]/i.test(text);
+  return /[а-яё]/i.test(text);
 }
 
-export const isValidImgSrc = (src, id) => {
-  // const img = createDomElement('img');
-  let goodSrc = true;
-
-  fetch(src).then(function(response) {
-    if (response.status !== 200) {
-        console.log(44444444444);
-        goodSrc = false;
-        
-      } else {
-          // go the desired response
-          console.log(43545);
-          
-      }
-  }).catch(function(err) {
-      // some error here
-      console.log(`=====>>>${err}`);
-      goodSrc = false;
-      const img = document.querySelectorAll('.movie-card__link');
-      img.src = '../img/noposter.png';
-  });
-
-  console.log();
+export const saveToLocalStorage = (key, value) => {
+  console.log(`saveToLocalStorage ${key} ${value}`);
   
-  return goodSrc;
-}
+  const serialObj = JSON.stringify(value);
+  localStorage.setItem(key, serialObj);
+};
+
+export const restoreFromLocalStorage = (key) => {
+  console.log(`restoreFromLocalStorage`);
+  
+  if (localStorage.getItem(key)) {
+    console.log(`restoreFromLocalStorage ${key} ${localStorage.getItem(key)}`);
+  
+    return JSON.parse(localStorage.getItem(key));
+  }  
+  return undefined;
+};

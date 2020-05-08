@@ -2,11 +2,9 @@
   padding-top: 50px;
   min-height: 800px;
   box-sizing: border-box;
-
   background: #141E30;
   background: -webkit-linear-gradient(to right, #243B55, #141E30); 
   background: linear-gradient(to right, #243B55, #141E30);
-
 }
 
 .search-bar {
@@ -37,6 +35,9 @@
   }
   &::-webkit-search-cancel-button {
     cursor: pointer;
+  }
+  @include media-keyboard {
+    padding-right: 10px;
   }
 }
 
@@ -112,7 +113,6 @@
 
 .error-bar {
   margin: 20px 0 30px;
-
   &__text {
     max-width: 90%;
     height: 30px;
@@ -164,9 +164,12 @@
   opacity: 1;
   @extend %transition;
 
+  &__disappear {
+    height: 0;
+    opacity: 0;
+  }
   &__hide {
     display: none;
-    opacity: 0;
   }
   @include media-keyboard {
     display: none;

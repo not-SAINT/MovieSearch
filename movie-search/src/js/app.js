@@ -1,31 +1,16 @@
-import { getRandomIndex } from './worker';
+import * as Worker from './worker';
 import * as AppOptions from './options';
+import * as Animation from './animation';
 import MovieCard from './moviecard';
-
-const endSearching = () => {
-  document.getElementById('loupe').classList.remove('loupe-searching');
-}
-
-const showSlides = () => {
-  
-  setTimeout(() => {
-    console.log('show delay');
-    document.querySelectorAll('.movie-card').forEach(n => n.classList.add('movie-card__show'));
-  }, 0);
-  console.log('slides showwwwwwwwww APP');
-  
-}
 
 export default class MovieSearch {
   constructor(slider) {
     this.slider = slider;    
     this.lastResultSize = 0;
     this.currPage = 1;
-    // this.slidesContainer = document.getElementById(sliderId);
-    this.errorfield = document.getElementById('errorfield');
+    this.errorfield = document.getElementById(AppOptions.ERROR_FIELD_ID);
     this.lastSearchText = '';
     this.lastSearchPageCount = 0;
-    // this.searchString = '';
     this.isCyrillicSearch = false;
   }
 
@@ -34,7 +19,8 @@ export default class MovieSearch {
         const cards = document.querySelectorAll(`[slideid=${movie.imdbID}]`);
         cards.forEach(card => {
         const cardMovie = card;
-        cardMovie.lastElementChild.innerText = `${movie.imdbRating}/10`
+        const rating = (movie.imdbRating && movie.imdbRating !== 'N/A') ? `${movie.imdbRating}/10` : 'N/A';
+        cardMovie.lastElementChild.innerText = rating;
       });
     }
     catch (e) {
@@ -85,7 +71,6 @@ export default class MovieSearch {
     }
     
     this.slider.appendSlide(newSlides);   
-    // showSlides(); 
   }
 
   showError(msg) {
@@ -96,8 +81,8 @@ export default class MovieSearch {
     this.errorfield.innerText = '';
   }
 
-  loadDefaultMovieCards () {
-    const index = getRandomIndex(AppOptions.rndreq.length);
+  loadSavedMovieCards () {
+    const index = Worker.getRandomIndex(AppOptions.rndreq.length);
     const arr = AppOptions.rndreq[index].Search;
 
     if (!arr) {
@@ -107,10 +92,23 @@ export default class MovieSearch {
 
     this.errorfield.innerText = '';
     this.addNewSlides(arr);
-    showSlides();
+    Animation.showSlides();
   }
 
-  async translateAndSearch (text) {
+  loadDefaultMovieCards (previosSearchText) {
+    if (AppOptions.SAVEAPIKEY_MODE_ON) {
+      this.loadSavedMovieCards();
+    } else {
+      const index = Worker.getRandomIndex(AppOptions.START_APP_MOVIES.length);
+      const defaultSearchText = previosSearchText || AppOptions.START_APP_MOVIES[index];
+      console.log(`defaultSearchText = ${defaultSearchText}`);
+      
+
+      this.getMovieCards(defaultSearchText);  
+    }      
+  }
+
+  async translateSearchText (text) {
     try {
       this.clearError();
       const translateUrl = `${AppOptions.YANDEX_API_URL}${AppOptions.YANDEX_API_KEY}&text=${text}`;
@@ -126,26 +124,26 @@ export default class MovieSearch {
       } 
 
     } catch (e) {
-      console.log(`translateAndSearch error => ${e}`);
-      endSearching();
+      console.log(`translateSearchText error => ${e}`);
+      Animation.endSearching();
       this.showError(e);
     }
   }
  
   async getMovieCards (search, nextPage = false) {
-    // try {      
+    try {      
       this.currPage = nextPage ? this.currPage + 1 : 1;
 
       // current search reached end
       if (this.currPage !== 1 && this.currPage > this.lastSearchPageCount) {
         console.log(`results reach end`);
-        endSearching();
+        Animation.endSearching();
         return;
       }
       console.log(`APP.isCyrillicSearch =>> ${this.isCyrillicSearch}`);
 
       if (!(nextPage || this.isCyrillicSearch)) {
-        console.log(`APP.getMovieCards =>> 1111`);
+        console.log(`APP.getMovieCards =>>  search = ${search} this.currPage = ${this.currPage}`);
         this.lastSearchText = search; 
         this.clearError();
       }
@@ -162,7 +160,7 @@ export default class MovieSearch {
         // this.errorfield.innerText = `${AppOptions.DEFAULT_ERROR}${searchString}. ${data.Error}`;
         // const inputText = document.getElementById('searchinput').value;
         this.showError(`${AppOptions.DEFAULT_ERROR}${this.lastSearchText}. ${data.Error}`);
-        endSearching();
+        Animation.endSearching();
         // console.log(data.Error);
         return;
       }
@@ -183,17 +181,21 @@ export default class MovieSearch {
         if (this.currPage === 1) {
           // this.slidesContainer.innerHTML = '';
           this.slider.removeAllSlides();
+          this.slider.update();
+
+
           this.lastSearchPageCount = Math.ceil(data.totalResults / 10);
-          console.log(`this.lastSearchPageCount = ${this.lastSearchPageCount}`);          
+          console.log(`this.lastSearchPageCount = ${this.lastSearchPageCount}`);   
+          Worker.saveToLocalStorage(AppOptions.LAST_SEARCH_KEY, { 'lastSearchText': this.lastSearchText });
         }        
         this.addNewSlides(data.Search);
-        endSearching();
-        showSlides();
+        Animation.endSearching();
+        Animation.showSlides();
       }
 
-    // } catch (e) {
-    //   console.log(`getMovieCards error => ${e}`);
-    //   this.showError(e);
-    // }
+    } catch (e) {
+      console.log(`getMovieCards error => ${e}`);
+      this.showError(e);
+    }
   }
 }
