@@ -1,6 +1,7 @@
 .footer {
   width: 100%;
   background-color: $color-main;
+  user-select: none;
   @media screen and (min-height: 900px) {
     position: fixed;
     bottom: 0;

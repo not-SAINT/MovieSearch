@@ -25,7 +25,7 @@ export const YANDEX_API_KEY = 'trnsl.1.1.20200502T123304Z.3dbd097eb78d1bbf.b5c08
 export const SLIDER_CLASS = '.swiper-container';
 export const SLIDES = 'slides';
 export const ERROR_FIELD_ID = 'errorfield';
-export const NO_POSTER = '../img/noposter.png';
+export const NO_POSTER = '../img/noposter.jpg';
 export const DEFAULT_ERROR = 'No results for ';
 export const DEFAULT_MESSAGE = 'Showing results for ';
 

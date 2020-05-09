@@ -28,7 +28,7 @@ const showMoreResults = () => {
 }
 
 const searchMovies = async () => {
-  const searchString = document.getElementById('searchinput').value; 
+  const searchString = INPUT.value;
     
   if (!searchString) {
     return;
@@ -47,10 +47,6 @@ const searchMovies = async () => {
 
   APP.getMovieCards(searchString);
   Animation.showSlides();
-}
-
-const setFocusOnInput = () => {
-  document.getElementById('searchinput').focus();
 }
 
 const isNeedPreloadSlides = () => {
@@ -74,7 +70,7 @@ const buildSlider = () => {
     direction: 'horizontal',
     loop: false,
     initialSlide: 0,
-    effect: 'slide', // "slide", "fade", "cube", "coverflow" or "flip"
+    effect: 'slide',
     watchOverflow: true,
     spaceBetween: AppOptions.CARUSEL_GAP,
     breakpoints: AppOptions.CARUSEL_BREAK_POINTS,
@@ -175,8 +171,8 @@ window.onload = () => {
   }
     
   INPUT = document.getElementById('searchinput');
+  INPUT.focus();
   
-  setFocusOnInput();
   Animation.showSlides();
   createKeyboard('.keyboard-wrapper', '.search-input');
   setHandlers();

@@ -2,18 +2,14 @@
   width: 100%;
   height: 500px;
   position: relative;
-
   font-weight: 700;
   text-align: center;
-
   border: 1px solid $color-shadow;
   border-radius: 4px;
   user-select: none;
   opacity: 0;
-  // @extend %transition;
   transition: opacity 1.5s ease;
   background-color: #ffffff;
-
   &__title {
     margin: 15px 25px;
     font-size: 1.5rem;
@@ -34,7 +30,6 @@
     object-fit: cover;
     box-shadow:0px 0px 14px 7px $color-shadow inset;
   }
-
   &__year {
     margin-top: 20px;
     font-size: 1.5rem;    
@@ -56,13 +51,9 @@
     background: url("../img/icons/rating.svg") no-repeat ;
     background-size: contain;
   }
-
   &__show {
-    // height: 0;
     opacity: 1;
     transition: opacity 1.5s ease;
-    // @extend %transition;
-    // transition: opacity 0.5s ease;
   }
 }
 
