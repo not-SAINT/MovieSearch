@@ -12,6 +12,7 @@
   width: 100%;
   display: flex;
   position: relative;
+
   @include media-laptop {
     width: 94%;
     margin: 0 auto;
@@ -30,13 +31,16 @@
   color: #9DBFAF;
   border-right: none;
   border: 3px solid #00b4cc;
+
   &:focus, 
   &:hover {
     color: #00b4cc;
   }
+
   &::-webkit-search-cancel-button {
     cursor: pointer;
   }
+
   @include media-keyboard {
     padding-right: 10px;
   }
@@ -53,6 +57,7 @@
   font-size: 20px;
   outline: none;
   transition: all 250ms ease-in-out;
+
   &:hover {
     background: $color-search-hover;
     border-color: $color-search-hover;
@@ -70,6 +75,7 @@
     border: 3px solid $color-search;
     background-color: transparent;
     border-radius: 50%;
+
   &::after {    
     display: block;
     content: "";
@@ -114,11 +120,11 @@
 
 .error-bar {
   margin: 20px 0 30px;
+
   &__text {
     max-width: 90%;
     height: 30px;
     margin: 0 auto;
-
     font-size: 1.5rem;
     text-align: center;
     color: $color-error;
@@ -138,9 +144,11 @@
   background-size: contain;
   cursor: pointer;
   @extend %transition;
+
   &:hover {
     transform: scale(1.1);
   }
+
   @include media-keyboard {
     display: none;
   }
@@ -169,9 +177,11 @@
     height: 0;
     opacity: 0;
   }
+
   &__hide {
     display: none;
   }
+  
   @include media-keyboard {
     display: none;
   }

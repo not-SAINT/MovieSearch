@@ -5,7 +5,7 @@ import MovieCard from './moviecard';
 
 export default class MovieSearch {
   constructor(slider) {
-    this.slider = slider;    
+    this.slider = slider;
     this.lastResultSize = 0;
     this.currPage = 1;
     this.errorfield = document.getElementById(AppOptions.ERROR_FIELD_ID);
@@ -16,42 +16,39 @@ export default class MovieSearch {
 
   setMovieRating(movie) {
     try {
-        const cards = document.querySelectorAll(`[slideid=${movie.imdbID}]`);
-        cards.forEach(card => {
+      const cards = document.querySelectorAll(`[slideid=${movie.imdbID}]`);
+      cards.forEach((card) => {
         const cardMovie = card;
         const rating = (movie.imdbRating && movie.imdbRating !== 'N/A') ? `${movie.imdbRating}/10` : 'N/A';
         cardMovie.lastElementChild.innerText = rating;
       });
-    }
-    catch (e) {
+    } catch (e) {
       this.showError(e);
-    }    
+    }
   }
 
   async getMovieRatings(movieIDs) {
     try {
       const movies = [];
-      movieIDs.forEach ( id => {
+      movieIDs.forEach((id) => {
         const movie = fetch(`${AppOptions.OMDB_API_URL}${AppOptions.OMDB_API_KEY}&i=${id}`)
-                    .then(
-                      (successResponse) => {
-                        if (successResponse.status !== 200) {
-                          return null;
-                        }                         
-                        return successResponse.json();                        
-                      },
-                      () => {
-                        return null;
-                      }
-                    );
+          .then(
+            (successResponse) => {
+              if (successResponse.status !== 200) {
+                return null;
+              }
+              return successResponse.json();
+            },
+            () => null,
+          );
         movies.push(movie);
-      })
+      });
 
-      Promise.allSettled(movies).
-        then((results) => {
-          results.forEach(movie => this.setMovieRating(movie.value))
+      Promise.allSettled(movies)
+        .then((results) => {
+          results.forEach((movie) => this.setMovieRating(movie.value));
         });
-    } catch (e) {      
+    } catch (e) {
       this.showError(e);
     }
   }
@@ -63,14 +60,13 @@ export default class MovieSearch {
       const card = new MovieCard(movie);
       newSlides.push(card.render());
       movieIDs.push(movie.imdbID);
-      
     });
 
     if (AppOptions.RATING_ON) {
       this.getMovieRatings(movieIDs);
     }
-    
-    this.slider.appendSlide(newSlides);   
+
+    this.slider.appendSlide(newSlides);
   }
 
   showError(msg) {
@@ -81,7 +77,7 @@ export default class MovieSearch {
     this.errorfield.innerText = '';
   }
 
-  loadSavedMovieCards () {
+  loadSavedMovieCards() {
     const index = Worker.getRandomIndex(AppOptions.rndreq.length);
     const arr = AppOptions.rndreq[index].Search;
 
@@ -90,85 +86,82 @@ export default class MovieSearch {
       return;
     }
 
-    this.errorfield.innerText = '';
+    this.clearError();
     this.addNewSlides(arr);
     Animation.showSlides();
   }
 
-  loadDefaultMovieCards (previosSearchText) {
+  loadDefaultMovieCards(previosSearchText) {
     if (AppOptions.SAVEAPIKEY_MODE_ON) {
       this.loadSavedMovieCards();
     } else {
       const index = Worker.getRandomIndex(AppOptions.START_APP_MOVIES.length);
-      const defaultSearchText = previosSearchText || AppOptions.START_APP_MOVIES[index];     
+      const defaultSearchText = previosSearchText || AppOptions.START_APP_MOVIES[index];
 
-      this.getMovieCards(defaultSearchText);  
-    }      
+      this.getMovieCards(defaultSearchText);
+    }
   }
 
-  async translateSearchText (text) {
+  async translateSearchText(searchText) {
     try {
       this.clearError();
-      const translateUrl = `${AppOptions.YANDEX_API_URL}${AppOptions.YANDEX_API_KEY}&text=${text}`;
+      const translateUrl = `${AppOptions.YANDEX_API_URL}${AppOptions.YANDEX_API_KEY}&text=${searchText}`;
 
       const res = await fetch(translateUrl);
-      const data = await res.json();
-      if (data.code === 200 && data.text) {   
-        this.currPage = 1;            
-        [ this.lastSearchText ] = data.text;
+      const { code, text } = await res.json();
+      if (code === 200 && text) {
+        this.currPage = 1;
+        [this.lastSearchText] = text;
         this.errorfield.innerText = `${AppOptions.DEFAULT_MESSAGE}${this.lastSearchText}`;
-      } 
-
+      }
     } catch (e) {
       this.showError(e);
     }
   }
- 
-  async getMovieCards (search, nextPage = false) {
-    try {      
+
+  async getMovieCards(search, nextPage = false) {
+    try {
       this.currPage = nextPage ? this.currPage + 1 : 1;
 
       // current search has reached end
       if (this.currPage !== 1 && this.currPage > this.lastSearchPageCount) {
-        Animation.endSearching();
-        return;
+        return Animation.endSearching();
       }
 
       if (!(nextPage || this.isCyrillicSearch)) {
-        this.lastSearchText = search; 
+        this.lastSearchText = search;
         this.clearError();
       }
 
       const searchString = this.lastSearchText;
       const searchUrl = `${AppOptions.OMDB_API_URL}${AppOptions.OMDB_API_KEY}&page=${this.currPage}&s=${searchString}`;
       const res = await fetch(searchUrl);
-      const data = await res.json();   
+      const data = await res.json();
 
       if (data.Error && this.currPage === 1) {
         this.showError(`${AppOptions.DEFAULT_ERROR}${this.lastSearchText}. ${data.Error}`);
 
-        Animation.endSearching();
-        return;
+        return Animation.endSearching();
       }
 
-      this.lastRequestResult = data.Search.length;     
+      this.lastRequestResult = data.Search.length;
 
       if (this.lastRequestResult) {
         if (this.currPage === 1) {
           this.slider.removeAllSlides();
           this.slider.update();
-          this.lastSearchPageCount = Math.ceil(data.totalResults / 10);
+          this.lastSearchPageCount = Math.ceil(data.totalResults / AppOptions.IMDB_MAX_RATE);
 
-          Worker.saveToLocalStorage(AppOptions.LAST_SEARCH_KEY, { 'lastSearchText': this.lastSearchText });
-        }        
+          Worker.saveToLocalStorage(AppOptions.LAST_SEARCH_KEY,
+            { lastSearchText: this.lastSearchText });
+        }
         this.addNewSlides(data.Search);
-        Animation.endSearching();
         Animation.showSlides();
       }
-
     } catch (e) {
       Animation.endSearching();
       this.showError(e);
     }
+    return Animation.endSearching();
   }
 }

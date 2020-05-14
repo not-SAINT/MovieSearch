@@ -2,9 +2,11 @@
   width: 94%;
   height: 530px;
   margin: 0 auto;
+
   @include media-tablet {
     width: calc(100% - 64px);
   }
+  
   @include media-mobile {
     width: 85%;
   }
@@ -14,11 +16,13 @@
 .swiper-button-next {
   top: 58%;  
   color: $color-main;
+
   &:hover {
     filter: drop-shadow(0px 0px 5px $color-search-hover);
     -webkit-filter: drop-shadow(0px 0px 5px $color-search-hover);
     -moz-filter: drop-shadow(0px 0px 5px $color-search-hover);
   }
+
   &:focus {
     outline:0;
   }
@@ -28,6 +32,7 @@
   &-next {    
     right: 2px;    
   }
+
   &-prev {    
     left: 2px;
   }

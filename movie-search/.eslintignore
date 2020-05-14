@@ -2,4 +2,3 @@ dist
 node_modules
 webpack.config.js
 postcss.config.js
-__tests__

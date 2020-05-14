@@ -305,9 +305,9 @@ const createKeys = (keys) => {
 };
 
 const createKeyboard = (container, input) => {
-    restoreState();
-    createBase(container, input);
-    createKeys(KEYS);
-}
+  restoreState();
+  createBase(container, input);
+  createKeys(KEYS);
+};
 
 export default createKeyboard;

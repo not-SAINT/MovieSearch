@@ -2,7 +2,9 @@ import { createDomElement } from './worker';
 import * as AppOptions from './options';
 
 export default class MovieCard {
-  constructor({Title, imdbID, Year, Poster}) {
+  constructor({
+    Title, imdbID, Year, Poster,
+  }) {
     this.title = Title;
     this.imdbID = imdbID;
     this.year = Year;
@@ -10,9 +12,9 @@ export default class MovieCard {
   }
 
   render(rating) {
-    const rate = rating || '-/10';    
-    const poster = (this.poster !== 'N/A') ? this.poster : AppOptions.NO_POSTER;
-    const ifBadPosterUrl = ` onerror="this.src = '${AppOptions.NO_POSTER}'" `;
+    const rate = rating || AppOptions.DEFAULT_MOVIE_RATE;
+    const poster = (this.poster !== AppOptions.API_N_A_ERROR) ? this.poster : AppOptions.NO_POSTER;
+    const onErrorPosterUrl = ` onerror="this.src = '${AppOptions.NO_POSTER}'" `;
 
     const card = createDomElement('div', 'swiper-slide');
 
@@ -20,7 +22,7 @@ export default class MovieCard {
       <h2 class="movie-card__title">
         <a href="${AppOptions.MOVIE_URL}${this.imdbID}/videogallery" title="${this.title}" class="movie-card__link" target="_blank">${this.title}</a>
       </h2>
-      <img class="movie-card__poster" src="${poster}" alt="${this.title}" ${ifBadPosterUrl}>
+      <img class="movie-card__poster" src="${poster}" alt="${this.title}" ${onErrorPosterUrl}>
       <span class="movie-card__year">${this.year}</span>
       <span class="movie-card__rating">${rate}</span>
       </div>`;

@@ -1,11 +1,13 @@
 module.exports = {
     "env": {
         "browser": true,
-        "es6": true
+        "es6": true,
+        "jest":true
     },
         "extends": [
             "airbnb-base",
-            "prettier"
+            "prettier",
+            'eslint-config-prettier'
         ],
     "globals": {
         "Atomics": "readonly",
@@ -16,5 +18,6 @@ module.exports = {
         "sourceType": "module"
     },
     "rules": {
+        "linebreak-style": ["error", "windows"],
     }
 };

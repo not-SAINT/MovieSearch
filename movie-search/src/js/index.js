@@ -1,7 +1,7 @@
-import '../css/swiper.min.css';
 import '../css/keyboard.css';
 import '../css/style.css';
 import '../css/style.scss';
+
 
 import Swiper from 'swiper';
 import * as AppOptions from './options';
@@ -15,39 +15,38 @@ let SLIDER = {};
 let INPUT = {};
 let KEYBOARD_SHOW = true;
 
-const showMoreResults = () => {    
-  if (AppOptions.SAVEAPIKEY_MODE_ON) {    
+const showMoreResults = () => {
+  if (AppOptions.SAVEAPIKEY_MODE_ON) {
     APP.loadDefaultMovieCards();
     return;
   }
-  
+
   const searchString = INPUT.value;
 
-  Animation.startAnimateSearching();  
+  Animation.startAnimateSearching();
   APP.getMovieCards(searchString, true);
-}
+};
 
 const searchMovies = async () => {
   const searchString = INPUT.value;
-    
+
   if (!searchString) {
     return;
   }
 
-  Animation.hideSlides();  
+  Animation.hideSlides();
   Animation.startAnimateSearching();
 
-  if (Worker.isCyrilic(searchString)) {    
+  if (Worker.isCyrilic(searchString)) {
     APP.isCyrillicSearch = true;
     await APP.translateSearchText(searchString);
-  }
-   else {
+  } else {
     APP.isCyrillicSearch = false;
   }
 
   APP.getMovieCards(searchString);
   Animation.showSlides();
-}
+};
 
 const isNeedPreloadSlides = () => {
   const allSlides = SLIDER.slides.length;
@@ -57,15 +56,13 @@ const isNeedPreloadSlides = () => {
     return false;
   }
 
-  if (allSlides - currSlide <= SLIDER.params.slidesPerView + AppOptions.CARUSEL_PRELOAD_INDEX) {    
-    return true;
-  }
+  const buffSize = SLIDER.params.slidesPerView + AppOptions.CARUSEL_PRELOAD_INDEX;
 
-  return false;
-}
+  return (allSlides - currSlide <= buffSize);
+};
 
 const buildSlider = () => {
-  SLIDER = new Swiper (AppOptions.SLIDER_CLASS, {
+  SLIDER = new Swiper(AppOptions.SLIDER_CLASS, {
     slidesPerView: 4,
     direction: 'horizontal',
     loop: false,
@@ -92,7 +89,7 @@ const buildSlider = () => {
       slideChange: () => {
         if (isNeedPreloadSlides()) {
           showMoreResults();
-        }  
+        }
       },
     },
     keyboard: {
@@ -105,60 +102,60 @@ const buildSlider = () => {
 
 const onKeyUp = (event) => {
   const { key } = event;
-  if (key !== 'Enter') {    
+  if (key !== 'Enter') {
     return;
   }
 
   const searchString = INPUT.value;
   if (!searchString) {
     return;
-  } 
+  }
 
   searchMovies();
 };
 
 const onClickSearch = () => {
   searchMovies();
-}
+};
 
 const onKeyPressKeyboard = () => {
   searchMovies();
   KEYBOARD_SHOW = Animation.disappearKeyboard();
-}
+};
 
 const onKeyboardIcoClick = () => {
   if (!KEYBOARD_SHOW) {
-    KEYBOARD_SHOW = Animation.disappearKeyboard();    
+    KEYBOARD_SHOW = Animation.disappearKeyboard();
   } else {
-    KEYBOARD_SHOW = Animation.showKeyboard();    
-  }  
-}
+    KEYBOARD_SHOW = Animation.showKeyboard();
+  }
+};
 
-const closeVirtualKeyboard = ({target}) => {
+const closeVirtualKeyboard = ({ target }) => {
   const keyboardIco = target.closest('.keyboard-ico');
   const keyboardBase = target.closest('.keyboard-wrapper');
 
   if (!(keyboardIco || keyboardBase)) {
     KEYBOARD_SHOW = Animation.disappearKeyboard();
-  }  
-}
+  }
+};
 
 const onKeyboardTransitionend = () => {
   if (KEYBOARD_SHOW) {
-    Animation.hideKeyboard();  
-  }   
-}
+    Animation.hideKeyboard();
+  }
+};
 
 const setHandlers = () => {
   document.getElementById('searchbtn').addEventListener('click', onClickSearch);
   document.addEventListener('keyup', onKeyUp);
   document.getElementById('keyboardico').addEventListener('click', onKeyboardIcoClick);
   document.getElementById('enter').addEventListener('click', onKeyPressKeyboard);
-  document.addEventListener('click', closeVirtualKeyboard);  
+  document.addEventListener('click', closeVirtualKeyboard);
   document.getElementById('keyboard').addEventListener('transitionend', onKeyboardTransitionend);
-}
+};
 
-window.onload = () => {  
+window.onload = () => {
   buildSlider();
 
   APP = new MovieSearch(SLIDER);
@@ -169,11 +166,11 @@ window.onload = () => {
   } else {
     APP.loadDefaultMovieCards();
   }
-    
+
   INPUT = document.getElementById('searchinput');
   INPUT.focus();
-  
+
   Animation.showSlides();
   createKeyboard('.keyboard-wrapper', '.search-input');
   setHandlers();
-}
+};
