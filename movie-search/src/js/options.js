@@ -48,5 +48,5 @@ export const rndreq = [
 /* eslint-enable */
 
 // options for save API key limit
-export const RATING_ON = false;
+export const RATING_ON = true;
 export const SAVEAPIKEY_MODE_ON = false;
